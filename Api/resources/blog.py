@@ -1,5 +1,6 @@
 from flask import Response, request
 from flask_restful import Resource
+from flask_jwt_extended import jwt_required
 
 from repository.models import Blog
 
@@ -44,7 +45,7 @@ class BlogApi(Resource):
             raise BlogDoesNotExist
         except Exception as e:
             raise InternalServerError
-
+    
     def put(self, id):
         try:
             blog_data = request.get_json()
