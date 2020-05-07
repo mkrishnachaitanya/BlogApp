@@ -6,7 +6,8 @@ from flask_restful import Resource
 from flask_jwt_extended import ( 
     jwt_refresh_token_required,
     get_jwt_identity,
-    jwt_required
+    jwt_required,
+    jwt_optional
 )
 from repository.models import User, Blog
 from utils.helper import get_blogs
@@ -71,12 +72,18 @@ class RefreshAccessTokenApi(Resource):
             raise InternalServerError
 
 class GetUserDetailsApi(Resource):
-    @jwt_required
-    def get(self):
+    @jwt_optional
+    def get(self, username=None):
         try:
-            user_id = get_jwt_identity()
-            user = User.objects.get(id=user_id)
-            user_details = json.loads(user.to_json())
+            if username:
+                user = User.objects.get(username=username)
+                user_details = json.loads(user.to_json())
+                del user_details['email']
+                del user_details['is_confirmed']
+            else:
+                user_id = get_jwt_identity()
+                user = User.objects.get(id=user_id)
+                user_details = json.loads(user.to_json())
             del user_details['password']
             blogs = get_blogs(user_details, Blog)
             user_details['blogs'] = blogs

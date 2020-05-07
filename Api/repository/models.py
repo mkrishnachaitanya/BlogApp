@@ -8,6 +8,7 @@ class Blog(db.Document):
     tags = db.ListField(required=True)
     article_image_url = db.URLField(required=True)
     published_at = db.DateTimeField(default=datetime.datetime.now(datetime.timezone.utc))
+    username = db.ReferenceField('User')
     added_by = db.ReferenceField('User')
 
 class User(db.Document):

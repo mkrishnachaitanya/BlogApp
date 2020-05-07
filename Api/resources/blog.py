@@ -1,8 +1,9 @@
+import json
 from flask import Response, request
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from repository.models import Blog
+from repository.models import Blog, User
 
 from mongoengine.errors import (
     FieldDoesNotExist,
@@ -14,7 +15,8 @@ from mongoengine.errors import (
 from utils.errors import ( 
     InternalServerError,
     SchemaValidationError,
-    BlogDoesNotExist
+    BlogDoesNotExist,
+    UserDoesnotExistsError
 )
 
 class BlogsApi(Resource):
@@ -24,13 +26,22 @@ class BlogsApi(Resource):
             return Response(blogs, mimetype="application/json", status=200)
         except Exception as e:
             raise InternalServerError
-
+    
+    @jwt_required
     def post(self):
         try:
+            user_id = get_jwt_identity()
             blog_data = request.get_json()
-            blog = Blog(**blog_data)
+            user = User.objects.get(id=user_id)
+            user_details = json.loads(user.to_json())
+            username = user_details.get('username')
+            blog = Blog(**blog_data, added_by=user_id, username=username)
             blog.save()
+            user.update(push__blogs=blog)
+            user.save()
             return Response(blog.to_json(), mimetype="application/json", status=200)
+        except DoesNotExist:
+            raise UserDoesnotExistsError
         except (FieldDoesNotExist, ValidationError):
             raise SchemaValidationError
         except Exception as e:
@@ -46,11 +57,15 @@ class BlogApi(Resource):
         except Exception as e:
             raise InternalServerError
     
+    @jwt_required
     def put(self, id):
         try:
-            blog_data = request.get_json()
-            Blog.objects.get(id=id).update(**blog_data)
-            return Response(status=200)
+            user_id = get_jwt_identity()
+            blog = Blog.objects.get(id=id, added_by=user_id)
+            request_data = request.get_json()
+            blog.update(**request_data)
+            blog = Blog.objects.get(id=id, added_by=user_id)
+            return Response(blog.to_json(), mimetype="application/json", status=200)
         except DoesNotExist:
             raise BlogDoesNotExist
         except InvalidQueryError:
@@ -58,9 +73,11 @@ class BlogApi(Resource):
         except Exception as e:
             raise InternalServerError
     
+    @jwt_required
     def delete(self, id):
         try:
-            Blog.objects.get(id=id).delete()
+            user_id = get_jwt_identity()
+            Blog.objects.get(id=id, added_by=user_id).delete()
             return Response(status=204)
         except DoesNotExist:
             raise BlogDoesNotExist
