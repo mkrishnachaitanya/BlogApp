@@ -3,12 +3,30 @@ from flask import Flask
 from flask_restful import Api
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
 from repository.db import initialize_db
 from utils.errors import errors
 
 app = Flask(__name__)
 
+# Use this configurations for gmail SMTP server
+
 app.config['JWT_SECRET_KEY'] = "odKKwdIIY7odzesfVImtTj"
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = '465'
+app.config['MAIL_USERNAME'] = 'add-your-gmail-mail-here'
+app.config['MAIL_PASSWORD'] = 'add-your-password'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+# Use this configurations for local SMTP server 
+
+# app.config['MAIL_SERVER'] = 'localhost'
+# app.config['MAIL_PORT'] = '1025'
+# app.config['MAIL_USERNAME'] = 'welcome@blog.com'
+# app.config['MAIL_PASSWORD'] = ''
+
+mail = Mail(app)
 
 from resources.urls import initialize_urls
 

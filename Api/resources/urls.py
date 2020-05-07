@@ -6,6 +6,7 @@ from .user import (
     GetUserDetailsApi, 
     RefreshAccessTokenApi
 )
+from .confirm_email import SendConfirmEmail, ConfirmEmail
 
 def initialize_urls(api):
     api.add_resource(BlogsApi, "/api/blogs")
@@ -14,3 +15,5 @@ def initialize_urls(api):
     api.add_resource(SignUpApi, "/api/user/register")
     api.add_resource(LoginApi, "/api/user/login")
     api.add_resource(RefreshAccessTokenApi, "/api/user/refresh")
+    api.add_resource(SendConfirmEmail, "/api/user/send/confirm")
+    api.add_resource(ConfirmEmail, "/api/user/confirm")
