@@ -7,6 +7,7 @@ from .user import (
     RefreshAccessTokenApi
 )
 from .confirm_email import SendConfirmEmail, ConfirmEmail
+from .reset_password import ForgetPassword, ResetPassword
 
 def initialize_urls(api):
     api.add_resource(BlogsApi, "/api/blogs")
@@ -17,3 +18,5 @@ def initialize_urls(api):
     api.add_resource(RefreshAccessTokenApi, "/api/user/refresh")
     api.add_resource(SendConfirmEmail, "/api/user/send/confirm")
     api.add_resource(ConfirmEmail, "/api/user/confirm")
+    api.add_resource(ForgetPassword, "/api/user/forget")
+    api.add_resource(ResetPassword, "/api/user/reset")

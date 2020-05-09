@@ -5,3 +5,5 @@ Api/repository/__pycache__/models.cpython-37.pyc
 Api/resources/__pycache__/blog.cpython-37.pyc
 Api/resources/__pycache__/urls.cpython-37.pyc
 Api/utils/__pycache__/errors.cpython-37.pyc
+Api/repository/__pycache__/models.cpython-37.pyc
+*.pyc
